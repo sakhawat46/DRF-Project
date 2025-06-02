@@ -1,6 +1,8 @@
 from django.contrib import admin
 from . models import Student
+from unfold.admin import ModelAdmin
 
-# Register your models here.
+@admin.register(Student)
+class CustomAdminClass(ModelAdmin):
+    pass
 
-admin.site.register(Student)
