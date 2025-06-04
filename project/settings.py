@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.students',
     'apps.api',
+    'apps.employes',
+    'apps.agents',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +137,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Get your API key from https://ai.google.dev/
+GEMINI_API_KEY = 'AIzaSyAn2cc-HTHPVPCD0cMtmQi4IsSJPZnYywQ'
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+# Add this to your settings
+# OPENAI_API_KEY = os.getenv('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')
+
+# Get your API key from https://ai.google.dev/
+GEMINI_API_KEY = 'AIzaSyAn2cc-HTHPVPCD0cMtmQi4IsSJPZnYywQ'

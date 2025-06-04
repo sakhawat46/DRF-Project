@@ -7,5 +7,8 @@ urlpatterns = [
     path('students/', include('apps.students.urls')),
 
     #Api Endpoint
-    path('api/v1/', include('apps.api.urls'))
+    path('api/v1/', include('apps.api.urls')),
+
+
+    path('', include('apps.agents.urls')),
 ]

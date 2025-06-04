@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #messages {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            text-align: right;
+        }
+        .assistant-message {
+            background-color: #f5f5f5;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        #message-form {
+            display: flex;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 8px;
+        }
+        #send-button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Chatbot</h1>
+        <div id="messages">
+            {% for message in conversation.messages.all %}
+                <div class="{{ message.role }}-message">
+                    {{ message.content }}
+                </div>
+            {% endfor %}
+        </div>
+        <form id="message-form">
+            <input type="text" id="message-input" placeholder="Type your message...">
+            <button type="submit" id="send-button">Send</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const conversationId = {% if conversation %}{{ conversation.id }}{% else %}null{% endif %};
+            
+            $('#message-form').submit(function(e) {
+                e.preventDefault();
+                const message = $('#message-input').val().trim();
+                if (message) {
+                    // Add user message to UI
+                    $('#messages').append(
+                        `<div class="user-message">${message}</div>`
+                    );
+                    $('#message-input').val('');
+                    
+                    // Scroll to bottom
+                    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    
+                    // Show typing indicator
+                    $('#messages').append(
+                        `<div class="assistant-message">Thinking...</div>`
+                    );
+                    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    
+                    // Send to server
+                    const url = conversationId ? 
+                        `/api/send-message/${conversationId}/` : 
+                        '/api/send-message/';
+                    
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({message: message}),
+                        success: function(response) {
+                            // Remove typing indicator
+                            $('.assistant-message:last').remove();
+                            
+                            // Add response to UI
+                            $('#messages').append(
+                                `<div class="assistant-message">${response.response}</div>`
+                            );
+                            
+                            // Scroll to bottom
+                            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                            
+                            // If new conversation, update URL
+                            if (!conversationId && response.conversation_id) {
+                                window.history.pushState(
+                                    null, 
+                                    '', 
+                                    `/chat/${response.conversation_id}/`
+                                );
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
